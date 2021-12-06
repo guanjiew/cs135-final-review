@@ -1,0 +1,20 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname Q1) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+;; bar: nat nat -> nat
+ (define (bar m n)
+   (cond [(zero? (* m n)) (+ m n)]
+                                  [else (local [(define q (min m n (sqr (- m n))))]
+                       (bar (- m q) (- n q)))]))
+
+
+;; Will not terminate when m = n > 0; for example, (bar 1 1).
+;; If we require m ≠ n, then (m-n)2 > 0, so either mn = 0 or q > 0.
+;; Therefore the values of m and n are always strictly decreasing.
+;; Furthermore, since they decrease by the same amount, they will still not be equal on the recursive call.
+
+Always terminates. Note that the second condition is true whenever n is even. So if n is even, then the value on the recursive call is strictly decreasing. Now consider the binary representation of n. The number of 1's in the binary representation stays the same when n is even and decreases by exactly 1 when n is odd. Therefore n can only be odd a finite number of times, and therefore the algorithm terminates.
+
+Will not terminate when i is not divisible by the gcd of m and n. If we require that m and n are relatively prime, then the nontermination condition will never hold, and so the algorithm will always stop eventually.
+
+Always terminates. Note that the base (i.e. terminating) case here is when m+n ≥ 1000. We can see that (m-n) + (n+1)2 > m+n, so whenever the second case holds, the value of m+n is strictly increasing. And the first case can never hold twice in a row. So the function always terminates.
