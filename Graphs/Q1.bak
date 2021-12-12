@@ -33,12 +33,6 @@
 )
 (check-expect (list 4 3 3 0 0 2) (count-in-neighbours g1))
 
-;; edge-num: Graph -> Nat
-(define (edge-num g)
-  (foldr +
-         0 (map (lambda(pair) (length (second pair))) g)))
-(check-expect 12 (edge-num g1))
-
 ;; delete-node: Node Graph -> Graph
 ;; delete node v if v is in g
 (define (delete-node v g)
@@ -52,16 +46,3 @@
                 remove-node))]
     remove-edges))
 (check-expect (list (list 'A (list 'B 'F)) (list 'B '()) (list 'D (list 'A 'F)) (list 'E (list 'A 'B)) (list 'F (list 'A))) (delete-node 'C g1))
-
-
-
-;; add-node: Graph Node (listof Node) (listof Node) → Graph
-(define (add-node G node in-neighbours out-neighbours)
-  (cons (list node out-neighbours)
-        (map (lambda (x)
-               (list (first x)
-                     (cond[(member? (first x) in-neighbours)  (cons node (second x))]
-                          [else (second x)])))
-             G)))
-(check-expect (list (list 'H (list 'D 'F)) (list 'A (list 'H 'B 'C 'F)) (list 'B (list 'H)) (list 'C (list 'A 'B)) (list 'D (list 'A 'C 'F)) (list 'E (list 'A 'B 'C)) (list 'F (list 'A)))
-              (add-node g1 'H '(A B) '(D F)))

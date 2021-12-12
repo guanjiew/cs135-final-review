@@ -1,37 +1,13 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname Q3) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
-(define g1
-  '((A (B C F))
-    (B ())
-    (C (A B))
-    (D (A C F))
-    (E (A B C))
-    (F (A))))
-
-;; neighbours: Node Graph →(listof Node)
-;; produces list of neighbours of v in G
-(define (neighbours v g)
-  (local [(define found (filter (lambda (x) (symbol=? (first x) v)) g))]
-    (cond
-      [(empty? found) false]
-      [else (second (first found))]
-     )
-   )
-)
-
 ; has-cycle?: Graph → Bool
 (define (has-cycle? G)
-  (local [
-          ;; has-cycle?/list: (listof Node) (listof Node) → Bool
+  (local [;; has-cycle?/list: (listof Node) (listof Node) → Bool
           (define (has-cycle?/list lo-nodes visited)
             (cond [(empty? lo-nodes) false]
                   [(member? (first lo-nodes) visited) true]
                   [else (or (has-cycle?/list (neighbours (first lo-nodes) G)
                                              (cons (first lo-nodes) visited))
-                            (has-cycle?/list (rest lo-nodes) visited))]))
-          ]
-    (has-cycle?/list (map first G) empty))
-  )
-
-(has-cycle? g1)
+                            (has-cycle?/list (rest lo-nodes) visited))]))]
+    (has-cycle?/list (map first G) empty)))

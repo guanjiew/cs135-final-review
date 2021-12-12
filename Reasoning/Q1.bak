@@ -4,8 +4,9 @@
 ;; bar: nat nat -> nat
  (define (bar m n)
    (cond [(zero? (* m n)) (+ m n)]
-         [else (local [(define q (min m n (sqr (- m n))))]
+                                  [else (local [(define q (min m n (sqr (- m n))))]
                        (bar (- m q) (- n q)))]))
+
 
 ;; Will not terminate when m = n > 0; for example, (bar 1 1).
 ;; If we require m ≠ n, then (m-n)2 > 0, so either mn = 0 or q > 0.

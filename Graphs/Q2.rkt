@@ -1,61 +1,38 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname Q2) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
-;; Example of DAG
-(define g1 
-  '((1 (2))
-    (2 (3 4))
-    (3 (4 5 7))
-    (4 (2 5))
-    (5 (6 7))
-    (6 (7))
-    (7 ())))
-
-;; A Node is a Sym
-
-;; A Graph is one of :
-;; * empty
-;; * (cons (list v (list w_1 w_2 ... w_n) ) G)
-;; where G is a Graph, v, w1 ... w_n are Node
-;; w_1, .., w_n is the out neighbor of v
+;; (dedup lst) produces a list that has all the duplicates removed from lst
+;; dedup: (listof X) ->(listof X)
+(define (dedup lst)
+  (foldr (lambda (x y)
+           (cond [(member? x y) y]
+                 [else (cons x y)]))
+         empty lst))
 
 ;; neighbours: Node Graph →(listof Node)
-;;produces list of neighbours of v in G
-(define (neighbours v G)
-  (cond [(empty? G) (error "vertex not in graph")]
-        [else
-         (cond [(= v (first (first G))) (second (first G))]
-               [else (neighbours v (rest G))])]))
+(define (neighbours v g)
+  (cond [(empty? g) empty] 
+        [(symbol=? v (first (first g))) (second (first g))]
+        [else (neighbours v (rest g))]))
 
-;;find-trip/list: (listof Node) Node Graph (listof Node) -> (anyof Nat false)
-(define (find-trip/list nbrs dest G visited)
-   (cond [(empty? nbrs) false]
-         [(member? (first nbrs) visited)
-          (find-trip/list (rest nbrs) dest G visited)]
-         [else (local
-                  [(define difficulty-first (find-trip/acc (first nbrs) dest G visited))
-                   (define difficulty-rest  (find-trip/list (rest nbrs) dest G visited))]
-                   (cond [(false? difficulty-first) difficulty-rest]
-                         [(false? difficulty-rest)  difficulty-first]
-                         [else (min difficulty-first difficulty-rest)]
-                   )
-                )
-          ]
-   )
-)
+;; graph-union: Graph Graph →Graph
+(define (graph-union g1 g2)
+  (local [(define g1-nodes (map first g1))
+          (define g2-nodes (map first g2))]
+    (map (lambda (node)
+           (list node
+                 (dedup (append (neighbours node g1)
+                                (neighbours node g2)))))
+         (dedup (append g1-nodes g2-nodes)))))
 
-;; find-trip/acc: Node Node Graph (list of Node) -> (anyof Nat false)
-(define (find-trip/acc orig dest G visited)
-  (cond [(= orig dest) dest]
-        [else (local [(define nbrs (neighbours orig G))
-                      (define difficulty (find-trip/list nbrs dest G (cons orig visited)))]
-                (cond [(false? difficulty) false]
-                      [else (+ orig difficulty)]))]))
+(define g1 '((A (B))
+              (B ())))
 
-;; easiest-trip: Node Node Graph -> (anyof Nat false)
-;; Wrapper function
-(define (easiest-trip orig dest G)
-  (find-trip/acc orig dest G empty))
+(define g2  '((A (B C))
+               (B (A C))
+               (C (A))))
 
-
-(easiest-trip 1 6 g1)
+(define g3 '((A (B C))
+             (B (A C))
+             (C (A))))
+(check-expect (graph-union g1 g2) g3 )

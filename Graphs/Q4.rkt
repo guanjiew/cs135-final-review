@@ -1,0 +1,34 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname Q4) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+(define g1
+  '((A (B))
+    (B (A))))
+
+
+;; neighbours: Node Graph →(listof Node)
+;; produces list of neighbours of v in G
+(define (neighbours v g)
+  (local [(define found (filter (lambda (x) (symbol=? (first x) v)) g))]
+    (cond
+      [(empty? found) false]
+      [else (second (first found))]
+     )
+   )
+)
+
+;max-path-length/list: (listof Node) Graph → Nat
+
+(define (max-path-length/list l-nds dag)
+  (cond
+    [(empty? l-nds) 0]
+    [else (local [(define nbrs (neighbours (first l-nds) dag))]
+            (cond [(empty? nbrs)
+                   (max-path-length/list (rest l-nds) dag)]
+                  [else (max (add1 (max-path-length/list nbrs dag))
+                             (max-path-length/list (rest l-nds) dag))]))]))
+;; max-path-length: Graph → Nat
+(define (max-path-length dag)
+(max-path-length/list (map first dag) dag))
+
+(max-path-length g1)

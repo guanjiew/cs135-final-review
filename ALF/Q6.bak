@@ -51,7 +51,7 @@
     )
 )
 
-;; my-andma3: (X->boolean) (listof X) -> boolean
+;; my-andma3p: (X->boolean) (listof X) -> boolean
 ;; Using my-ormap? to implement my-andmap?
 (define my-andmap3?
     (lambda (pred lst)
